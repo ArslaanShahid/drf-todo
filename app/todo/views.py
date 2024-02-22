@@ -56,3 +56,32 @@ class TodoView(APIView):
                     'data':{}
 
                 })
+            obj = Todo.objects.filter(uid = data.get('uid'))
+            if not obj.exists():
+                return Response({
+                    'status':False,
+                    'message': 'invalid uid',
+                    'data':{}
+
+                })
+            serializer = TodoSerializer(obj[0], data=data, partial=True)
+            if not serializer.is_valid():
+                return Response({
+                    'status': False,
+                    'message': 'invalid fields',
+                    'data': serializer.errors
+                })
+                
+            serializer.save()
+            return Response({
+                'status':True,
+                'message': 'Todo is Updated',
+                'data':serializer.data
+            })
+        except Exception as e:
+            print(e)
+            return Response({
+                'status': False,
+                'message': 'something went wrong',
+                'data':{}
+            })
